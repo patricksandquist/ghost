@@ -27,7 +27,7 @@ class Game
     @fragment = ""
 
     until round_over?
-      take_turn()
+      take_turn(@current_player)
       @losses[@current_player] += 1 if round_over?
       next_player!
     end
