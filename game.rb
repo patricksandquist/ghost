@@ -1,4 +1,8 @@
+require_relative 'player.rb'
+
 class Game
+  ALPHABET = ("a".."z").to_a
+
   def initialize(player1)
     # Add player2 later
     @player1 = player1
@@ -13,11 +17,11 @@ class Game
       play_round
     end
 
-    @losses.each do |player, losses|
-      loser = player if losses >= 5
+    losing_hash = @losses.select do |player, losses|
+      losses >= 5
     end
 
-    puts "The game is over, #{loser.name} has GHOST!"
+    puts "The game is over, #{losing_hash.keys[0].name} has GHOST!"
   end
 
   private
@@ -27,7 +31,17 @@ class Game
 
     until round_over?
       take_turn(@current_player)
-      @losses[@current_player] += 1 if round_over?
+
+      if round_over?
+        puts "#{@current_player.name} just spelled #{@fragment}!"
+        @losses[@current_player] += 1
+
+        unless @losses[@current_player] == 5
+          ghost_frag = @current_player.ghost(@losses[@current_player])
+          puts "#{@current_player.name} now has #{ghost_frag}"
+        end
+      end
+
       next_player!
     end
   end
@@ -36,7 +50,9 @@ class Game
     # Get valid play from player
     valid_play = false
     until valid_play
+      puts "fragment: #{@fragment}"
       letter = player.get_play
+      puts "letter: #{letter}"
 
       if valid_play?(letter)
         # Change the flag to exit loop
@@ -55,9 +71,10 @@ class Game
   end
 
   def valid_play?(letter)
-    return false unless letter.length == 1 && letter.downcase! =~ /[a-z]/
+    return false unless ALPHABET.include?(letter)
 
     new_fragment = @fragment + letter
+    puts "new_fragment: #{new_fragment}"
     @dictionary.any? { |word, _| word.start_with?(new_fragment) }
   end
 
