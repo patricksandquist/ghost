@@ -4,10 +4,7 @@ class Game
     @player1 = player1
     @losses = {@player1 => 0}
     populate_dictionary
-    run
   end
-
-  private
 
   def run
     @current_player = @player1
@@ -22,6 +19,8 @@ class Game
 
     puts "The game is over, #{loser.name} has GHOST!"
   end
+
+  private
 
   def play_round
     @fragment = ""
@@ -73,4 +72,9 @@ class Game
       @dictionary[word] = true
     end
   end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  game = Game.new(Player.new("Patrick"))
+  game.run
 end
