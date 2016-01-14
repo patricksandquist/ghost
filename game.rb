@@ -3,16 +3,14 @@ require_relative 'player.rb'
 class Game
   ALPHABET = ("a".."z").to_a
 
-  def initialize(player1)
-    # Add player2 later
-    @player1 = player1
-    @losses = {@player1 => 0}
+  def initialize(*players)
+    @players = players
+    @losses = {}
+    @players.each { |player| @losses[player] = 0 }
     populate_dictionary
   end
 
   def run
-    @current_player = @player1
-
     until @losses.values.any? { |losses| losses >= 5 }
       play_round
     end
@@ -30,20 +28,24 @@ class Game
     @fragment = ""
 
     until round_over?
-      take_turn(@current_player)
+      take_turn(current_player)
 
       if round_over?
-        puts "#{@current_player.name} just spelled #{@fragment}!"
-        @losses[@current_player] += 1
+        puts "#{current_player.name} just spelled #{@fragment}!"
+        @losses[current_player] += 1
 
-        unless @losses[@current_player] == 5
-          ghost_frag = @current_player.ghost(@losses[@current_player])
-          puts "#{@current_player.name} now has #{ghost_frag}"
+        unless @losses[current_player] == 5
+          ghost_frag = current_player.ghost(@losses[current_player])
+          puts "#{current_player.name} now has #{ghost_frag}"
         end
       end
 
       next_player!
     end
+  end
+
+  def current_player
+    @players.first
   end
 
   def take_turn(player)
@@ -67,7 +69,7 @@ class Game
   end
 
   def next_player!
-    # do nothing now
+    @players.rotate!
   end
 
   def valid_play?(letter)
@@ -92,6 +94,6 @@ class Game
 end
 
 if __FILE__ == $PROGRAM_NAME
-  game = Game.new(Player.new("Patrick"))
+  game = Game.new(Player.new("Patrick"), Player.new("Other"))
   game.run
 end
