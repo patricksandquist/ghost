@@ -28,15 +28,30 @@ class Game
 
     until round_over?
       take_turn()
-      switch_players!
+      @losses[@current_player] += 1 if round_over?
+      next_player!
     end
   end
 
   def take_turn(player)
     # Get valid play from player
+    valid_play = false
+    until valid_play
+      letter = player.get_play
+
+      if valid_play?(letter)
+        # Change the flag to exit loop
+        valid_play = true
+      else
+        # Let the player know that it was a bad guess
+        player.alert_invalid_guess
+      end
+    end
+
+    @fragment += letter
   end
 
-  def switch_players!
+  def next_player!
     # do nothing now
   end
 
